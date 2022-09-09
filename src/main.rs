@@ -1,4 +1,6 @@
-use serialport;
+use std::time::Instant;
+
+use serialport::{self, SerialPort};
 use serialport::{available_ports};
 
 use crate::comms::{Packet, ControlByte};
@@ -17,6 +19,8 @@ fn main() {
         println!("{}", port.port_name);
     }
 
+    print!("\n\n");
+
     let mut marv_port = serialport::new("COM6", 19200).open().expect("Failed to open port");
 
     let mut buffer: Vec<u8> = vec![0; 32];
@@ -28,121 +32,84 @@ fn main() {
     let mut out_packet = Packet::new();
     let mut in_packet = Packet::new();
 
-    marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-    out_packet.print();
+    let time = Instant::now();
+
+    send_packet(ControlByte::Start, &mut out_packet, &mut marv_port);
 
     println!("Waiting for response...");
-    
-    while marv_port.bytes_to_read().unwrap() < 4 { }
-    marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-    in_packet.print();
+
+    get_packet(&mut in_packet, &mut marv_port);
 
     if in_packet.control_byte() != 16 {
         println!("ERROR: Expected BUTTON, but got above packet...")
     }
 
     while in_packet.dat1() == 0 {
-        while marv_port.bytes_to_read().unwrap() < 4 { }
-        marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-        in_packet.print();
+        get_packet(&mut in_packet, &mut marv_port);
     }
-
-    in_packet.print();
 
     println!("Calibrate:");
 
-    out_packet.set_control_byte(ControlByte::CCalibrate);
-    out_packet.print();
-    marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
+    send_packet(ControlByte::CCalibrate, &mut out_packet, &mut marv_port);
+    send_packet(ControlByte::CVelocity, &mut out_packet, &mut marv_port);
+    send_packet(ControlByte::CLevel, &mut out_packet, &mut marv_port);
+    send_packet(ControlByte::CColours, &mut out_packet, &mut marv_port);
 
-    out_packet.set_control_byte(ControlByte::CVelocity);
-    out_packet.print();
-    marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-    out_packet.set_control_byte(ControlByte::CLevel);
-    out_packet.print();
-    marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-    out_packet.set_control_byte(ControlByte::CColours);
-    out_packet.print();
-    marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-    while marv_port.bytes_to_read().unwrap() < 4 { }
-    marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-    in_packet.print();
+    get_packet(&mut in_packet, &mut marv_port);
 
     if in_packet.control_byte() != 80 {
-        println!("ERROR: Expected BUTTON, but got above packet...")
+        println!("ERROR: Expected BUTTON, but got above packet...");
     }
 
     while in_packet.dat1() == 0 {
-        while marv_port.bytes_to_read().unwrap() < 4 { }
-        marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-        in_packet.print();
+        get_packet(&mut in_packet, &mut marv_port);
     }
 
     println!("End Calibrate");
 
     // main NAVCON loop
-    for _i in 1..5 {
+    for _i in 1..50 {
         println!("NAVCON:");
-        while marv_port.bytes_to_read().unwrap() < 4 { }
 
-        marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-        in_packet.print();
+        get_packet(&mut in_packet, &mut marv_port);
 
         if in_packet.control_byte() != 145{
             println!("ERROR: Expected CLAPSNAP, but got above packet...")
         }
 
-        while marv_port.bytes_to_read().unwrap() < 4 { }
-
-        marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-        in_packet.print();
+        get_packet(&mut in_packet, &mut marv_port);
 
         if in_packet.control_byte() != 146{
             println!("ERROR: Expected BUTTON, but got above packet...")
         }
-        
-        while in_packet.control_byte() != 146 && in_packet.dat1() != 1{
-            if marv_port.bytes_to_read().unwrap() > 3 {
-                marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-            }
-        }
 
-        while marv_port.bytes_to_read().unwrap() < 4 { }
-
-        marv_port.read(&mut in_packet.bytes).expect("Failed to read bytes");
-        in_packet.print();
+        get_packet(&mut in_packet, &mut marv_port);
 
         if in_packet.control_byte() != 147{
             println!("ERROR: Expected NAVCON, but got above packet...")
         }
 
-        out_packet.set_control_byte(ControlByte::MLevel);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
+        send_packet(ControlByte::MLevel, &mut out_packet, &mut marv_port);
+        send_packet(ControlByte::MRotation, &mut out_packet, &mut marv_port);
+        send_packet(ControlByte::MSpeed, &mut out_packet, &mut marv_port);
+        send_packet(ControlByte::MDistance, &mut out_packet, &mut marv_port);
 
-        out_packet.set_control_byte(ControlByte::MRotation);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-        out_packet.set_control_byte(ControlByte::MSpeed);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-        out_packet.set_control_byte(ControlByte::MDistance);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-
-        out_packet.set_control_byte(ControlByte::MColours);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
-
-        out_packet.set_control_byte(ControlByte::MIncidence);
-        out_packet.print();
-        marv_port.write(&out_packet.bytes).expect("Failed to write data to the MARV... :(");
+        send_packet(ControlByte::MColours, &mut out_packet, &mut marv_port);
+        send_packet(ControlByte::MIncidence, &mut out_packet, &mut marv_port);
     }
     
+    println!("time: {}s", time.elapsed().as_nanos() as f32/1000_000_000.0);
+
+}
+
+fn send_packet(control_byte: ControlByte, packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+    packet.set_control_byte(control_byte);
+    port.write(&packet.bytes).expect("Failed to write data to the MARV... :(");
+    packet.print();
+}
+
+fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+    while port.bytes_to_read().unwrap() < 4 { }
+    port.read(&mut packet.bytes).expect("Failed to read bytes");
+    packet.print();
 }
