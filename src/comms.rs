@@ -59,7 +59,6 @@ impl Packet {
 
         println!("{}", table);
 
-//[((self.bytes[0] & 0b11000000) >> 6), ((self.bytes[0] & 0b00110000) >> 4), (self.bytes[0] & 0b00001111) ,self.bytes[1], self.bytes[2], self.bytes[3]];
     }
 }
 
@@ -102,8 +101,4 @@ pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
     while port.bytes_to_read().unwrap() < 4 { }
     port.read(&mut packet.bytes).expect("Failed to read bytes");
     packet.print();
-}
-
-pub fn get_char(string: &String, index: usize) -> char {
-    string.as_str().chars().nth(index).expect("No character at that index")
 }

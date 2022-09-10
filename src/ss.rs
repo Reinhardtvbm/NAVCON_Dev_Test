@@ -21,10 +21,6 @@ impl SS {
         + ((self.sensor[4] as u16))) as u16
     }
 
-    pub fn get_incidence(&self) -> u8 {
-        self.incidence
-    }
-
     pub fn set_incidence(&mut self, val: u8) {
         self.incidence = val;
     } 

@@ -4,6 +4,7 @@ mod colour;
 mod comms;
 mod navcon;
 mod file_parser;
+mod cmd;
 
 use std::time::Instant;
 use std::io::{stdin, Read};
@@ -11,7 +12,8 @@ use serialport::{self, SerialPort};
 use serialport::{available_ports};
 
 
-use crate::comms::{Packet, ControlByte, get_packet, send_packet, get_char};
+use crate::cmd::get_user_input;
+use crate::comms::{Packet, ControlByte, get_packet, send_packet};
 use crate::navcon::run_navcon_with;
 use crate::file_parser::{parse_file};
 
@@ -36,46 +38,33 @@ fn main() {
     }
 
     print!("\n");
+    let mut input = get_user_input("Which port are you using? [1, 2, ...]");
 
-    println!("Which port are you using? [1/2/...]");
-
-    let mut input = String::new();
-
-    stdin()
-    .read_line(&mut input)
-    .ok()
-    .expect("No Message to read");
-
-    let mut marv_port = serialport::new(format!("COM{}", get_char(&input, 0)), 19200)
+    let mut marv_port = serialport::new(format!("COM{}", input), 19200)
                                              .open()
                                              .expect("Failed to open port");
 
-    println!("Start in default mode(1)? [y/n]");
+    input = get_user_input("Start in default mode(1)? [y/n]")
+            .to_ascii_lowercase();
 
-    input = String::new();
-    stdin().read_line(&mut input).ok().expect("No Message to read");
+    let test_data: Vec<([char; 5], u8)>;
 
-    let char = get_char(&input, 0).to_ascii_lowercase();
-
-    let mut test_data: Vec<([char; 5], u8)> = Vec::new();
-
-    match char {
+    match input {
         'y' => {
-            print!("Select a QTP to run [1-5]: ");
-
-            input = String::new();
-            stdin().read_line(&mut input).ok().expect("No Message to read");
-
-            let qtp = get_char(&input, 0);
-            let num = String::from(qtp).parse::<i32>().unwrap();
-
-            if num > 5 {
-                panic!("Only QTP1-5 exists...");
-            }
-            
-            test_data = parse_file(format!("QTP{}.txt", num));
+            test_data = parse_file(mode_1());
         },
-        'n' => todo!(),
+        'n' => {
+            let mode = get_user_input("Select a mode to run in [1-3]:");
+
+            match mode {
+                '1' => test_data = parse_file(mode_1()),
+                '2' => test_data = parse_file(mode_2()),
+                '3' => todo!(),
+                _ => panic!("There are only three modes")
+            }
+
+
+        },
         _ => panic!("Expected 'y' or 'n'")
     }
 
@@ -143,4 +132,27 @@ fn run_touches(port: &mut Box<dyn SerialPort>) {
     }
 
     println!("End Calibrate");
+}
+
+fn mode_1() -> String {
+    let num = get_user_input("Select a QTP to run [1-5]: ")
+                    .to_string().parse::<i32>()
+                    .expect("Expexted a number");
+
+    if num > 5 {
+        panic!("Only QTP1-5 exists...");
+    }
+
+    format!("QTPs/Dr_Badenhorst_QTPs/QTP{}.txt", num)
+}
+
+fn mode_2() -> String {
+    println!("type in the name of your custom QTP: ['filename.txt']");
+
+    let mut input;
+
+    input = String::new();
+    stdin().read_line(&mut input).ok().expect("No Message to read");
+
+    format!("QTPs/Custom_QTPs/{}", input)
 }
