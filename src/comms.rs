@@ -1,6 +1,8 @@
 use serialport::SerialPort;
 use tabled::{Tabled, Table, Style};
 
+#[allow(non_snake_case)]
+
 #[derive(Tabled)]
 struct Heading {
     SYS: u8,
@@ -39,9 +41,9 @@ impl Packet {
         self.bytes[2] = val;
     }
 
-    pub fn set_dec(&mut self, val: u8) {
-        self.bytes[2] = val;
-    }
+    // pub fn set_dec(&mut self, val: u8) {
+    //     self.bytes[2] = val;
+    // }
 
     pub fn set_control_byte(&mut self, c_byte: ControlByte) {
         self.bytes[0] = c_byte as u8;

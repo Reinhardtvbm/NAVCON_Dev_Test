@@ -8,15 +8,15 @@ pub enum Colour {
 }
 
 impl Colour {
-    pub fn convert_to_char(&self) -> char {
-        match self {
-            Colour::White => 'W',
-            Colour::Red => 'R',
-            Colour::Green => 'G',
-            Colour::Blue => 'B',
-            Colour::Black => 'N',
-        }
-    }
+    // pub fn convert_to_char(&self) -> char {
+    //     match self {
+    //         Colour::White => 'W',
+    //         Colour::Red => 'R',
+    //         Colour::Green => 'G',
+    //         Colour::Blue => 'B',
+    //         Colour::Black => 'N',
+    //     }
+    // }
 
     pub fn from_char(char: char) -> Self {
         match char.to_ascii_uppercase() {
