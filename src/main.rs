@@ -1,17 +1,20 @@
-use std::time::Instant;
-use std::io::stdin;
-use serialport::{self, SerialPort};
-use serialport::{available_ports};
-
-use crate::comms::{Packet, ControlByte, get_packet, send_packet, get_char};
-use crate::navcon::run_navcon_with;
-
 mod ss;
 mod mdps;
 mod colour;
 mod comms;
 mod navcon;
-mod SS;
+mod file_parser;
+
+use std::time::Instant;
+use std::io::{stdin, Read};
+use serialport::{self, SerialPort};
+use serialport::{available_ports};
+
+
+use crate::comms::{Packet, ControlByte, get_packet, send_packet, get_char};
+use crate::navcon::run_navcon_with;
+use crate::file_parser::{parse_file};
+
 
 fn main() {
     println!("\n**************************************************************************************");
@@ -22,7 +25,7 @@ fn main() {
     println!("MODES:");
     println!("1. Default mode: asks for a NAVCON QTP to run, then runs it");
     println!("2. Custom Input mode: lets you type in colour sensor values \n   and an incidence value to test a case of your choosing");
-    println!("3. Custom Script mode: type in the name of a custom QTP textfile. /n   see README.txt");
+    println!("3. Custom Script mode: type in the name of a custom QTP textfile. \n   see README.txt");
     println!("======================================================================================");
     println!("Here are the available serial ports:");
 
@@ -54,8 +57,24 @@ fn main() {
 
     let char = get_char(&input, 0).to_ascii_lowercase();
 
+    let mut test_data: Vec<([char; 5], u8)> = Vec::new();
+
     match char {
-        'y' => {},
+        'y' => {
+            print!("Select a QTP to run [1-5]: ");
+
+            input = String::new();
+            stdin().read_line(&mut input).ok().expect("No Message to read");
+
+            let qtp = get_char(&input, 0);
+            let num = String::from(qtp).parse::<i32>().unwrap();
+
+            if num > 5 {
+                panic!("Only QTP1-5 exists...");
+            }
+            
+            test_data = parse_file(format!("QTP{}.txt", num));
+        },
         'n' => todo!(),
         _ => panic!("Expected 'y' or 'n'")
     }
@@ -70,11 +89,18 @@ fn main() {
 
     let time = Instant::now();
 
+    /*
+     *============================================================================================================
+     *       MAIN FUNCTIONALITY
+     *============================================================================================================
+     */
+
     run_touches(&mut marv_port);
     
     // main NAVCON loop
-    for _i in 1..50 {
-        run_navcon_with(todo!(), todo!(), &mut marv_port);
+
+    for (colour_set, incidence) in test_data {
+        run_navcon_with(colour_set, incidence, &mut marv_port);
     }
     
     println!("time: {}s", time.elapsed().as_nanos() as f32/1000_000_000.0);
@@ -113,7 +139,7 @@ fn run_touches(port: &mut Box<dyn SerialPort>) {
     }
 
     while in_packet.dat1() == 0 {
-        get_packet(&mut in_packet, &mut port);
+        get_packet(&mut in_packet, port);
     }
 
     println!("End Calibrate");

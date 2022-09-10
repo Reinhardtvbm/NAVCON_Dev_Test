@@ -1,5 +1,5 @@
 use serialport::SerialPort;
-use tabled::{TableIteratorExt, Tabled, Table, Style};
+use tabled::{Tabled, Table, Style};
 
 #[derive(Tabled)]
 struct Heading {
