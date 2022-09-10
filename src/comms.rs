@@ -1,3 +1,4 @@
+use serialport::SerialPort;
 use tabled::{TableIteratorExt, Tabled, Table, Style};
 
 #[derive(Tabled)]
@@ -30,12 +31,16 @@ impl Packet {
         return self.bytes[1];
     }
 
-    pub fn dat0(&self) -> u8 {
-        return self.bytes[2];
+    pub fn set_dat1(&mut self, val: u8) {
+        self.bytes[1] = val;
     }
 
-    pub fn dec(&self) -> u8 {
-        return self.bytes[3];
+    pub fn set_dat0(&mut self, val: u8) {
+        self.bytes[2] = val;
+    }
+
+    pub fn set_dec(&mut self, val: u8) {
+        self.bytes[2] = val;
     }
 
     pub fn set_control_byte(&mut self, c_byte: ControlByte) {
@@ -85,4 +90,20 @@ pub enum ControlByte {
     MDistance = 164,
     // SSos = 208,
     Start = 0
+}
+
+pub fn send_packet(control_byte: ControlByte, packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+    packet.set_control_byte(control_byte);
+    port.write(&packet.bytes).expect("Failed to write data to the MARV... :(");
+    packet.print();
+}
+
+pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+    while port.bytes_to_read().unwrap() < 4 { }
+    port.read(&mut packet.bytes).expect("Failed to read bytes");
+    packet.print();
+}
+
+pub fn get_char(string: &String, index: usize) -> char {
+    string.as_str().chars().nth(index).expect("No character at that index")
 }
