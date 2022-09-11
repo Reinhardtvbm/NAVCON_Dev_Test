@@ -9,39 +9,39 @@ and then simulate the SS and MDPS using the that data.
 
 For now, only SS input data has been implemented. So the syntax for
 a Test Protocol Text File (TPTF) is as follows:
-
--> sensor colours
--> incidence
--> sensor colours
--> incidence
--> sensor colours
--> incidence
--> ......
+<br />
+-> sensor colours<br />
+-> incidence<br />
+-> sensor colours<br />
+-> incidence<br />
+-> sensor colours<br />
+-> incidence<br />
+-> ......<br />
 
 where sensor colours is a _5_ character _String_, where the colours 
-are represented at follows:
-    - White: 'W'
-    - Red: 'R'
-    - Green: 'G'
-    - Blue: 'B'
-    - Black: 'N'
+are represented at follows:<br />
+    - White: 'W'<br />
+    - Red: 'R'<br />
+    - Green: 'G'<br />
+    - Blue: 'B'<br />
+    - Black: 'N'<br />
 
 and incidence is an _8-bit unsigned integer_ (0<incidence<255)
 
 example:
-
-WWWWW
-0
-GWWWW
-5
-GGWWW
-5
-WWWWW
-5
-WWWWW
-5
-BWWWW
-45
+<br />
+WWWWW<br />
+0<br />
+GWWWW<br />
+5<br />
+GGWWW<br />
+5<br />
+WWWWW<br />
+5<br />
+WWWWW<br />
+5<br />
+BWWWW<br />
+45<br />
 ...
 
 There is no limit on the number of lines in a TPTF, The Bench 
