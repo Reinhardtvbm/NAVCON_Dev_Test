@@ -1,10 +1,11 @@
 use serialport::SerialPort;
-use tabled::{Tabled, Table, Style};
+use tabled::Tabled;
 
 #[allow(non_snake_case)]
 
-#[derive(Tabled)]
-struct Heading {
+#[derive(Tabled, Debug)]
+pub struct Entry {
+    Direction: String,
     SYS: u8,
     SUB: u8,
     IST: u8,
@@ -48,25 +49,12 @@ impl Packet {
     pub fn set_control_byte(&mut self, c_byte: ControlByte) {
         self.bytes[0] = c_byte as u8;
     }
-
-    pub fn print(&self) {
-        if ((self.bytes[0] & 0b00110000) >> 4) == 1 {
-            println!("Received: ");
-        }
-        else {println!("Sent: ");}
-
-        let out: Heading = Heading::from(self.clone());
-
-        let table = Table::new([out]).with(Style::modern());
-
-        println!("{}", table);
-
-    }
 }
 
-impl From<Packet> for Heading {
+impl From<Packet> for Entry {
     fn from(p: Packet) -> Self {
-        Heading { 
+        Entry { 
+            Direction: String::from("Out"),
             SYS: ((p.bytes[0] & 0b11000000) >> 6),
             SUB: ((p.bytes[0] & 0b00110000) >> 4),
             IST: (p.bytes[0] & 0b00001111) , 
@@ -93,14 +81,16 @@ pub enum ControlByte {
     Start = 0
 }
 
-pub fn send_packet(control_byte: ControlByte, packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+pub fn send_packet(control_byte: ControlByte, packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry {
     packet.set_control_byte(control_byte);
     port.write(&packet.bytes).expect("Failed to write data to the MARV... :(");
-    packet.print();
+    Entry::from(*packet)
 }
 
-pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) {
+pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry {
     while port.bytes_to_read().unwrap() < 4 { }
     port.read(&mut packet.bytes).expect("Failed to read bytes");
-    packet.print();
+    let mut out = Entry::from(*packet);
+    out.Direction = String::from("In");
+    out
 }

@@ -7,6 +7,7 @@ mod file_parser;
 mod cmd;
 
 use std::time::Instant;
+use std::fs;
 use std::io::{stdin, Read};
 use serialport::{self, SerialPort};
 use serialport::{available_ports};
@@ -30,6 +31,8 @@ fn main() {
     println!("3. Custom Script mode: type in the name of a custom QTP textfile. \n   see README.txt");
     println!("======================================================================================");
     println!("Here are the available serial ports:");
+
+    let mut results = String::new();
 
     let ports = available_ports().expect("No serial ports available");
 
@@ -78,6 +81,8 @@ fn main() {
 
     let time = Instant::now();
 
+    
+
     /*
      *============================================================================================================
      *       MAIN FUNCTIONALITY
@@ -88,12 +93,13 @@ fn main() {
     
     // main NAVCON loop
 
-    for (colour_set, incidence) in test_data {
-        run_navcon_with(colour_set, incidence, &mut marv_port);
+    for (i, (colour_set, incidence)) in test_data.iter().enumerate() {
+        results = format!("{}\n\nInput set no: {}\n{}", results, i+1, run_navcon_with(*colour_set, *incidence, &mut marv_port));
     }
     
-    println!("time: {}s", time.elapsed().as_nanos() as f32/1000_000_000.0);
+    results = format!("{}\n\n{}s", results, (time.elapsed().as_secs() as f64 + time.elapsed().subsec_millis() as f64 * 1e-3));
 
+    fs::write("results.txt", results).expect("file no work");
 }
 
 fn run_touches(port: &mut Box<dyn SerialPort>) {
@@ -143,7 +149,7 @@ fn mode_1() -> String {
         panic!("Only QTP1-5 exists...");
     }
 
-    format!("QTPs/Dr_Badenhorst_QTPs/QTP{}.txt", num)
+    format!("src/QTPs/Dr_Badenhorst_QTPs/QTP{}.txt", num)
 }
 
 fn mode_2() -> String {
@@ -154,5 +160,5 @@ fn mode_2() -> String {
     input = String::new();
     stdin().read_line(&mut input).ok().expect("No Message to read");
 
-    format!("QTPs/Custom_QTPs/{}", input)
+    format!(r"src\QTPs\Custom_QTPs\{}", input)
 }

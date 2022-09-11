@@ -1,9 +1,9 @@
-use std::{fs::File, io::Read};
+use std::{fs::{OpenOptions}, io::Read};
 
 pub fn parse_file(filename: String) -> Vec<([char; 5], u8)> {
     let mut string_data = String::new();
 
-    let mut file = File::create(&filename).expect(format!("**ERROR: the file ({}) could not be found**", filename).as_str());
+    let mut file = OpenOptions::new().read(true).open(&filename).expect(format!("**ERROR: the file ({}) could not be found**", filename).as_str());
 
     file.read_to_string(&mut string_data).expect(format!("**ERROR: Could not read {}**", filename).as_str());
     
@@ -11,9 +11,11 @@ pub fn parse_file(filename: String) -> Vec<([char; 5], u8)> {
 
     let lines = string_data.lines();
 
+    let mut entry: ([char; 5], u8) = (['W'; 5], 0);
+
     for (i, line) in lines.into_iter().enumerate() {
-        let mut entry: ([char; 5], u8) = (['W'; 5], 0);
-        if i % 2 == 1 {
+        
+        if i % 2 == 0 {
             // is a colour set
             let mut colour_set = ['W'; 5];
 
@@ -25,9 +27,10 @@ pub fn parse_file(filename: String) -> Vec<([char; 5], u8)> {
         }
         else {
             entry.1 = line.to_string().parse::<u8>().expect(format!("**ERROR: The incidence at line {} in the file {} is not an unsigned 8-bit integer**", i, filename).as_str());
+            data.push(entry);
         }
 
-        data.push(entry);
+        
     }
 
     data
