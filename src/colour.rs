@@ -1,4 +1,4 @@
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Colour {
     White = 0b000,
     Red = 0b001,
@@ -26,6 +26,19 @@ impl Colour {
             'B' => Colour::Blue,
             'N' => Colour::Black,
             _ => panic!("Expected values in [W, R, G, B, N]")
+        }
+    }
+}
+
+impl From<u16> for Colour {
+    fn from(number: u16) -> Self {
+        match number {
+            0b000 => Colour::White,
+            0b001 => Colour::Red,
+            0b010 => Colour::Green,
+            0b011 => Colour::Blue,
+            0b100 => Colour::Black,
+            _ => panic!("Invalid conversion to colour")
         }
     }
 }

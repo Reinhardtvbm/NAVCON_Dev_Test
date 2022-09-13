@@ -32,8 +32,6 @@ fn main() {
     println!("======================================================================================");
     println!("Here are the available serial ports:");
 
-    let mut results = String::new();
-
     let ports = available_ports().expect("No serial ports available");
 
     for port in ports {
@@ -89,17 +87,26 @@ fn main() {
      *============================================================================================================
      */
 
-    run_touches(&mut marv_port);
     
+    run_touches(&mut marv_port);
+
+    let mut results = String::new();
+    let mut simple_results = String::new();
+
     // main NAVCON loop
 
     for (i, (colour_set, incidence)) in test_data.iter().enumerate() {
-        results = format!("{}\n\nInput set no: {}\n{}", results, i+1, run_navcon_with(*colour_set, *incidence, &mut marv_port));
+        let result = run_navcon_with(*colour_set, *incidence, &mut marv_port);
+        results = format!("{}\n\nInput set no: {}\n{}", results, i+1, result.0);
+        simple_results = format!("{}\n\nInput set no: {}\n{}", simple_results, i+1, result.1);
     }
     
     results = format!("{}\n\n{}s", results, (time.elapsed().as_secs() as f64 + time.elapsed().subsec_millis() as f64 * 1e-3));
 
+
     fs::write("results.txt", results).expect("file no work");
+    fs::write("simple_results.txt", simple_results).expect("file no work");
+
 }
 
 fn run_touches(port: &mut Box<dyn SerialPort>) {

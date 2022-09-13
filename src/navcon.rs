@@ -1,8 +1,9 @@
 use serialport::SerialPort;
 use tabled::{Table, Style};
-use crate::{comms::{get_packet, send_packet, ControlByte, Packet, Entry}, ss::SS};
+use crate::{comms::{get_packet, send_packet, ControlByte, Packet, Entry}, ss::SS, file_parser::simplify_output};
 
-pub fn run_navcon_with(colours: [char; 5], incidence: u8, port: &mut Box<dyn SerialPort>) -> String {
+
+pub fn run_navcon_with(colours: [char; 5], incidence: u8, port: &mut Box<dyn SerialPort>) -> (String, String) {
     println!("NAVCON:");
     
     let mut table_entries: Vec<Entry> = Vec::new();
@@ -54,5 +55,5 @@ pub fn run_navcon_with(colours: [char; 5], incidence: u8, port: &mut Box<dyn Ser
     let string_output = Table::new(table_entries.iter()).with(Style::modern()).to_string();
     print!("{}", string_output);
 
-    string_output
+    (string_output, simplify_output(table_entries))
 }

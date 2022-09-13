@@ -5,13 +5,13 @@ use tabled::Tabled;
 
 #[derive(Tabled, Debug)]
 pub struct Entry {
-    Direction: String,
-    SYS: u8,
-    SUB: u8,
-    IST: u8,
-    Dat1: u8,
-    Dat0: u8,
-    Dec: u8,
+    pub Direction: String,
+    pub SYS: u8,
+    pub SUB: u8,
+    pub IST: u8,
+    pub Dat1: u8,
+    pub Dat0: u8,
+    pub Dec: u8,
 }
 
 #[derive(Clone, Copy)]

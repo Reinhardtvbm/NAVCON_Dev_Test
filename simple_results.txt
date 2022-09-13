@@ -1,0 +1,190 @@
+
+
+Input set no: 1
+SNC: MARV must go forward
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 0 deg
+
+
+Input set no: 2
+SNC: MARV must go forward
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 5 deg
+
+
+Input set no: 3
+SNC: MARV must go forward
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 10 deg
+
+
+Input set no: 4
+SNC: MARV must go forward
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 15 deg
+
+
+Input set no: 5
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 20 deg
+
+
+Input set no: 6
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 25 deg
+
+
+Input set no: 7
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 30 deg
+
+
+Input set no: 8
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 35 deg
+
+
+Input set no: 9
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 40 deg
+
+
+Input set no: 10
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 45 deg
+
+
+Input set no: 11
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 50 deg
+
+
+Input set no: 12
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 55 deg
+
+
+Input set no: 13
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 60 deg
+
+
+Input set no: 14
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 65 deg
+
+
+Input set no: 15
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 70 deg
+
+
+Input set no: 16
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 75 deg
+
+
+Input set no: 17
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 80 deg
+
+
+Input set no: 18
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 85 deg
+
+
+Input set no: 19
+SNC: MARV must reverse
+MDPS: last measured rotation is 0 deg
+MDPS: MARV's right wheel speed is 0 mm/s
+MDPS: MARV's left wheel speed is 0 mm/s
+MDPS: MARV's distance travelled since last stop is 0 mm
+SS: sees colours [Green, White, White, White, White]
+SS: measured incidence 90 deg
