@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use serialport::SerialPort;
 use tabled::Tabled;
 
@@ -32,6 +34,14 @@ impl Packet {
 
     pub fn dat1(&self) -> u8 {
         return self.bytes[1];
+    }
+
+    pub fn dat0(&self) -> u8 {
+        return self.bytes[2];
+    }
+
+    pub fn dec(&self) -> u8 {
+        return self.bytes[3];
     }
 
     pub fn set_dat1(&mut self, val: u8) {
@@ -93,4 +103,22 @@ pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry 
     let mut out = Entry::from(*packet);
     out.Direction = String::from("In");
     out
+}
+
+pub enum PacketNo {
+    Touch = 0,
+    Clap = 1,
+    Navigate = 2
+}
+
+impl Index<PacketNo> for [Packet] {
+    type Output = Packet;
+
+    fn index(&self, index: PacketNo) -> &Self::Output {
+        match index {
+            PacketNo::Touch => &self[0],
+            PacketNo::Clap => &self[1],
+            PacketNo::Navigate => &self[2],
+        }
+    }
 }

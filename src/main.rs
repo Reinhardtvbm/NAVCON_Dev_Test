@@ -5,6 +5,7 @@ mod comms;
 mod navcon;
 mod file_parser;
 mod cmd;
+mod auxiliary;
 
 use std::time::Instant;
 use std::fs;
@@ -14,6 +15,7 @@ use serialport::{available_ports};
 
 
 use crate::cmd::get_user_input;
+use crate::colour::Colour;
 use crate::comms::{Packet, ControlByte, get_packet, send_packet};
 use crate::navcon::run_navcon_with;
 use crate::file_parser::{parse_file};
@@ -48,7 +50,7 @@ fn main() {
     input = get_user_input("Start in default mode(1)? [y/n]")
             .to_ascii_lowercase();
 
-    let test_data: Vec<([char; 5], u8)>;
+    let test_data: Vec<(Colour, u8)>;
 
     match input {
         'y' => {

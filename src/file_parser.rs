@@ -1,39 +1,34 @@
 use std::{fs::{OpenOptions}, io::Read};
 
-use crate::{comms::Entry, colour::Colour};
+use crate::{comms::Entry, colour::Colour, cmd::get_char_str};
 
-pub fn parse_file(filename: String) -> Vec<([char; 5], u8)> {
+pub fn parse_file(filename: String) -> Vec<(Colour, u8)> {
     let mut string_data = String::new();
-
     let mut file = OpenOptions::new().read(true).open(&filename).expect(format!("**ERROR: the file ({}) could not be found**", filename).as_str());
-
     file.read_to_string(&mut string_data).expect(format!("**ERROR: Could not read {}**", filename).as_str());
     
-    let mut data:  Vec<([char; 5], u8)> = Vec::new();
-
     let lines = string_data.lines();
 
-    let mut entry: ([char; 5], u8) = (['W'; 5], 0);
+    let mut protocol_data = Vec::new();
+    let mut entry = (Colour::White, 0_u8);
 
-    for (i, line) in lines.into_iter().enumerate() {
-        
-        if i % 2 == 0 {
-            // is a colour set
-            let mut colour_set = ['W'; 5];
+    for line in lines {
+        line.trim();
+        entry.0 = Colour::from(get_char_str(line, 0));
 
-            for (i, char) in line.to_string().chars().enumerate() {
-                colour_set[i] = char;
-            }
+        line.trim_matches(|c| c == 'G' || c == 'R' || c == 'B' || c == ' ' || c == '|');
 
-            entry.0 = colour_set;
+        if line != "*" {
+            entry.1 = line.parse::<u8>().unwrap();
         }
         else {
-            entry.1 = line.to_string().parse::<u8>().expect(format!("**ERROR: The incidence at line {} in the file {} is not an unsigned 8-bit integer**", i, filename).as_str());
-            data.push(entry);
-        }   
+            entry.1 = 50;
+        }
+        
+        protocol_data.push(entry);
     }
 
-    data
+    protocol_data
 }
 
 pub fn simplify_output(entries: Vec<Entry>) -> String {

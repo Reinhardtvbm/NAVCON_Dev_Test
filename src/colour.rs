@@ -7,6 +7,19 @@ pub enum Colour {
     Black = 0b100
 }
 
+impl From<char> for Colour {
+    fn from(char: char) -> Self {
+        match char.to_ascii_uppercase() {
+            'W' => Colour::White,
+            'R' => Colour::Red,
+            'G' => Colour::Green,
+            'B' => Colour::Blue,
+            'N' => Colour::Black,
+            _ => panic!("Expected values in [W, R, G, B, N]")
+        }
+    }
+}
+
 impl Colour {
     // pub fn convert_to_char(&self) -> char {
     //     match self {
@@ -17,17 +30,6 @@ impl Colour {
     //         Colour::Black => 'N',
     //     }
     // }
-
-    pub fn from_char(char: char) -> Self {
-        match char.to_ascii_uppercase() {
-            'W' => Colour::White,
-            'R' => Colour::Red,
-            'G' => Colour::Green,
-            'B' => Colour::Blue,
-            'N' => Colour::Black,
-            _ => panic!("Expected values in [W, R, G, B, N]")
-        }
-    }
 }
 
 impl From<u16> for Colour {
