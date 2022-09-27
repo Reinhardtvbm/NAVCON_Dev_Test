@@ -1,30 +1,33 @@
-use std::{fs::{OpenOptions}, io::Read};
+use std::{fs::OpenOptions, io::Read};
 
-use crate::{comms::Entry, colour::Colour, cmd::get_char_str};
+use crate::{cmd::get_char_str, colour::Colour, comms::Entry};
 
 pub fn parse_file(filename: String) -> Vec<(Colour, u8)> {
     let mut string_data = String::new();
-    let mut file = OpenOptions::new().read(true).open(&filename).expect(format!("**ERROR: the file ({}) could not be found**", filename).as_str());
-    file.read_to_string(&mut string_data).expect(format!("**ERROR: Could not read {}**", filename).as_str());
-    
+    let mut file = OpenOptions::new()
+        .read(true)
+        .open(&filename)
+        .expect(format!("**ERROR: the file ({}) could not be found**", filename).as_str());
+    file.read_to_string(&mut string_data)
+        .expect(format!("**ERROR: Could not read {}**", filename).as_str());
+
     let lines = string_data.lines();
 
     let mut protocol_data = Vec::new();
     let mut entry = (Colour::White, 0_u8);
 
     for line in lines {
-        line.trim();
-        entry.0 = Colour::from(get_char_str(line, 0));
+        let mut new_line = line.trim();
+        entry.0 = Colour::from(get_char_str(new_line, 0));
 
-        line.trim_matches(|c| c == 'G' || c == 'R' || c == 'B' || c == ' ' || c == '|');
+        new_line = line.trim_matches(|c| c == 'G' || c == 'R' || c == 'B' || c == ' ' || c == '|');
 
-        if line != "*" {
-            entry.1 = line.parse::<u8>().unwrap();
-        }
-        else {
+        if new_line != "*" {
+            entry.1 = new_line.parse::<u8>().unwrap();
+        } else {
             entry.1 = 50;
         }
-        
+
         protocol_data.push(entry);
     }
 
@@ -37,52 +40,86 @@ pub fn simplify_output(entries: Vec<Entry>) -> String {
     for entry in entries {
         match entry.SUB {
             // SNC
-            1 => {
-                match entry.IST {
-                    3 => {
-                        match entry.Dec {
-                            0 => file_output = format!("{}SNC: MARV must go forward\n", file_output),
-                            1 => file_output = format!("{}SNC: MARV must reverse\n", file_output),
-                            2 => file_output = format!("{}SNC: MARV must rotate {} deg left\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                            3 => file_output = format!("{}SNC: MARV must rotate {} deg right\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                            _ => panic!("Something has gone terribly wrong")
-                        }
+            1 => match entry.IST {
+                3 => match entry.Dec {
+                    0 => file_output = format!("{}SNC: MARV must go forward\n", file_output),
+                    1 => file_output = format!("{}SNC: MARV must reverse\n", file_output),
+                    2 => {
+                        file_output = format!(
+                            "{}SNC: MARV must rotate {} deg left\n",
+                            file_output,
+                            (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                        )
                     }
-                    _ => {},
-                }
+                    3 => {
+                        file_output = format!(
+                            "{}SNC: MARV must rotate {} deg right\n",
+                            file_output,
+                            (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                        )
+                    }
+                    _ => panic!("Something has gone terribly wrong"),
+                },
+                _ => {}
             },
             // MDPS
-            2 => {
-                match entry.IST {
+            2 => match entry.IST {
+                2 => match entry.Dec {
+                    0 => {
+                        file_output = format!(
+                            "{}MDPS: last measured rotation is {} deg\n",
+                            file_output,
+                            (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                        )
+                    }
                     2 => {
-                        match entry.Dec {
-                            0 => file_output = format!("{}MDPS: last measured rotation is {} deg\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                            2 => file_output = format!("{}MDPS: last measured rotation is {} deg left\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                            3 => file_output = format!("{}MDPS: last measured rotation is {} deg right\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                            _ => panic!("Something has gone terribly wrong"),
-                        }
+                        file_output = format!(
+                            "{}MDPS: last measured rotation is {} deg left\n",
+                            file_output,
+                            (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                        )
                     }
                     3 => {
-                        file_output = format!("{}MDPS: MARV's right wheel speed is {} mm/s\n", file_output, entry.Dat1);
-                        file_output = format!("{}MDPS: MARV's left wheel speed is {} mm/s\n", file_output, entry.Dat1);
+                        file_output = format!(
+                            "{}MDPS: last measured rotation is {} deg right\n",
+                            file_output,
+                            (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                        )
                     }
-                    4 => file_output = format!("{}MDPS: MARV's distance travelled since last stop is {} mm\n", file_output, (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)),
-                    _ => {},
+                    _ => panic!("Something has gone terribly wrong"),
+                },
+                3 => {
+                    file_output = format!(
+                        "{}MDPS: MARV's right wheel speed is {} mm/s\n",
+                        file_output, entry.Dat1
+                    );
+                    file_output = format!(
+                        "{}MDPS: MARV's left wheel speed is {} mm/s\n",
+                        file_output, entry.Dat1
+                    );
                 }
+                4 => {
+                    file_output = format!(
+                        "{}MDPS: MARV's distance travelled since last stop is {} mm\n",
+                        file_output,
+                        (((entry.Dat1 as u16) << 8) + entry.Dat0 as u16)
+                    )
+                }
+                _ => {}
             },
             // SS
-            3 => {
-                match entry.IST {
-                    1 => {
-                        let colours = get_colours(((entry.Dat1 as u16) << 8) + entry.Dat0 as u16);
-                        file_output = format!("{}SS: sees colours {:?}\n", file_output, colours);
-                    },
-                    2 => file_output = format!("{}SS: measured incidence {} deg\n", file_output, entry.Dat1),
-                    _ => panic!("Something has gone terribly wrong"), 
+            3 => match entry.IST {
+                1 => {
+                    let colours = get_colours(((entry.Dat1 as u16) << 8) + entry.Dat0 as u16);
+                    file_output = format!("{}SS: sees colours {:?}\n", file_output, colours);
                 }
-                
+                2 => {
+                    file_output =
+                        format!("{}SS: measured incidence {} deg\n", file_output, entry.Dat1)
+                }
+                _ => panic!("Something has gone terribly wrong"),
             },
-            _ => panic!("Something has gone terribly wrong"), 
+            _ => panic!("Something has gone terribly wrong"),
         }
     }
 

@@ -4,7 +4,6 @@ use serialport::SerialPort;
 use tabled::Tabled;
 
 #[allow(non_snake_case)]
-
 #[derive(Tabled, Debug)]
 pub struct Entry {
     pub Direction: String,
@@ -16,32 +15,35 @@ pub struct Entry {
     pub Dec: u8,
 }
 
+pub trait UsesSerial {
+    fn send_packet(&self, port: &mut Box<dyn SerialPort>);
+    fn get_packet(port: &mut Box<dyn SerialPort>) -> Packet;
+}
+
 #[derive(Clone, Copy)]
 pub struct Packet {
-    pub bytes: [u8; 4]
+    pub bytes: [u8; 4],
 }
 
 impl Packet {
     pub fn new() -> Self {
-        return Self{
-            bytes: [0; 4],
-        };
+        Self { bytes: [0; 4] }
     }
 
     pub fn control_byte(&self) -> u8 {
-        return self.bytes[0];
+        self.bytes[0]
     }
 
     pub fn dat1(&self) -> u8 {
-        return self.bytes[1];
+        self.bytes[1]
     }
 
     pub fn dat0(&self) -> u8 {
-        return self.bytes[2];
+        self.bytes[2]
     }
 
     pub fn dec(&self) -> u8 {
-        return self.bytes[3];
+        self.bytes[3]
     }
 
     pub fn set_dat1(&mut self, val: u8) {
@@ -52,9 +54,9 @@ impl Packet {
         self.bytes[2] = val;
     }
 
-    // pub fn set_dec(&mut self, val: u8) {
-    //     self.bytes[2] = val;
-    // }
+    pub fn set_dec(&mut self, val: u8) {
+        self.bytes[3] = val;
+    }
 
     pub fn set_control_byte(&mut self, c_byte: ControlByte) {
         self.bytes[0] = c_byte as u8;
@@ -63,15 +65,21 @@ impl Packet {
 
 impl From<Packet> for Entry {
     fn from(p: Packet) -> Self {
-        Entry { 
+        Entry {
             Direction: String::from("Out"),
             SYS: ((p.bytes[0] & 0b11000000) >> 6),
             SUB: ((p.bytes[0] & 0b00110000) >> 4),
-            IST: (p.bytes[0] & 0b00001111) , 
-            Dat1: p.bytes[1], 
-            Dat0: p.bytes[2], 
-            Dec: p.bytes[3] 
+            IST: (p.bytes[0] & 0b00001111),
+            Dat1: p.bytes[1],
+            Dat0: p.bytes[2],
+            Dec: p.bytes[3],
         }
+    }
+}
+
+impl From<[u8; 4]> for Packet {
+    fn from(_bytes: [u8; 4]) -> Self {
+        Self { bytes: _bytes }
     }
 }
 
@@ -88,17 +96,22 @@ pub enum ControlByte {
     MSpeed = 163,
     MDistance = 164,
     // SSos = 208,
-    Start = 0
+    Start = 0,
 }
 
-pub fn send_packet(control_byte: ControlByte, packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry {
+pub fn send_packet(
+    control_byte: ControlByte,
+    packet: &mut Packet,
+    port: &mut Box<dyn SerialPort>,
+) -> Entry {
     packet.set_control_byte(control_byte);
-    port.write(&packet.bytes).expect("Failed to write data to the MARV... :(");
+    port.write(&packet.bytes)
+        .expect("Failed to write data to the MARV... :(");
     Entry::from(*packet)
 }
 
 pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry {
-    while port.bytes_to_read().unwrap() < 4 { }
+    while port.bytes_to_read().unwrap() < 4 {}
     port.read(&mut packet.bytes).expect("Failed to read bytes");
     let mut out = Entry::from(*packet);
     out.Direction = String::from("In");
@@ -108,7 +121,7 @@ pub fn get_packet(packet: &mut Packet, port: &mut Box<dyn SerialPort>) -> Entry 
 pub enum PacketNo {
     Touch = 0,
     Clap = 1,
-    Navigate = 2
+    Navigate = 2,
 }
 
 impl Index<PacketNo> for [Packet] {
